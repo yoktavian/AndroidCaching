@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setTitle("Actors");
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -65,8 +64,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(retrofit2.Call<ActorList> call, Response<ActorList> response) {
                 if (response.isSuccessful()){
-                    read();
 //                  write(response.body().getActors());
+                    getSupportActionBar().setTitle("Data From Server");
+                    models = response.body().getActors();
+                    write();
+                    setData();
                 } else {
                     Log.e(TAG, "error");
                 }
@@ -75,23 +77,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(retrofit2.Call<ActorList> call, Throwable t) {
                 Log.e(TAG, "error "+String.valueOf(t.getMessage()));
+                read();
             }
         });
     }
 
-    private boolean checkingCache(){
-        boolean res = false;
-        SharedPreferences myPrefs = getSharedPreferences("default", MODE_PRIVATE);
-        String result = myPrefs.getString("key",null);
-        if (result!=null){
-            res = true;
-        }
-        return res;
-    }
-
-
-    private void write(ArrayList<ActorModels> actorsList){
-        String json = new Gson().toJson(actorsList);
+    private void write(){
+        String json = new Gson().toJson(models);
         try {
             ObjectOutput out = new ObjectOutputStream(new FileOutputStream
                     (new File(MainActivity.this.getCacheDir(), "") + File.separator + "cacheFile.srl"));
@@ -106,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void read(){
         String dat= null;
+        getSupportActionBar().setTitle("Data From Cache");
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream
                     (new File(MainActivity.this.getCacheDir() + File.separator + "cacheFile.srl")));
@@ -121,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            getSupportActionBar().setTitle("No cache");
         } catch (StreamCorruptedException e) {
             e.printStackTrace();
         } catch (IOException e) {
