@@ -41,7 +41,6 @@ import yoktavian.dev.testingcache.network.ApiService;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView img_a, img_b;
     private RecyclerView recyclerView;
     private AdapterActor adapter;
     private ArrayList<ActorModels> models;
@@ -64,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(retrofit2.Call<ActorList> call, Response<ActorList> response) {
                 if (response.isSuccessful()){
-//                  write(response.body().getActors());
                     getSupportActionBar().setTitle("Data From Server");
                     models = response.body().getActors();
                     write();
